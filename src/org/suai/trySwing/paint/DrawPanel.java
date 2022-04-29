@@ -1,4 +1,4 @@
-package org.suai.paint;
+package org.suai.trySwing.paint;
 
 import javax.swing.*;
 import java.awt.*;

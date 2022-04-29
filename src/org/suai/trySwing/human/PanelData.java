@@ -1,4 +1,4 @@
-package org.suai.human;
+package org.suai.trySwing.human;
 
 import javax.swing.*;
 import java.awt.*;

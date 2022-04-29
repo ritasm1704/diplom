@@ -1,24 +1,29 @@
 package org.suai.model;
 
-public class Player {
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
-    private int x, y;
+public class Player extends GameObject {
+
+    private boolean isRunning = false;
     private int health;
     private int maxHealth;
     private int speed;
     private int minSpeed;
     private int maxSpeed;
     private Weapon weapon;
+    private Arena arena;
 
-    public Player(int x, int y, int maxHealth, int minSpeed, int maxSpeed, Weapon weapon) {
-        this.x = x;
-        this.y = y;
+    public Player(int x, int y, int width, int height, int maxHealth, int minSpeed, int maxSpeed, Arena arena) {
+
+        super(x, y, width, height);
         this.maxHealth = maxHealth;
         this.health = maxHealth;
         this.minSpeed = minSpeed;
         this.speed = minSpeed;
         this.maxSpeed = maxSpeed;
-        this.weapon = weapon;
+        this.weapon = new Weapon(10, 1);
+        this.arena = arena;
     }
 
     public void reduceHealth(int a) {
@@ -74,19 +79,36 @@ public class Player {
     }
 
     public void moveX(int a) {
-        this.x += a * speed;
+        setX(getX() + a * speed);
     }
 
     public void moveY(int a) {
-        this.y += a * speed;
+        setY(getY() + a * speed);
     }
 
-    public int getX() {
-        return x;
+    public GameObject checkCollision() {
+
+
+        return null;
     }
 
-    public int getY() {
-        return y;
+    public void itIsRunning(boolean a) {
+        isRunning = a;
+    }
+
+    public void update(Arena arena) {
+        if (arena.rightPressed) {
+            moveX(1);
+        }
+        if (arena.leftPressed) {
+            moveX(-1);
+        }
+        if (arena.upPressed) {
+            moveY(-1);
+        }
+        if (arena.downPressed) {
+            moveY(1);
+        }
     }
 
 }

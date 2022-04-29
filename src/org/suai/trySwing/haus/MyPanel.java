@@ -1,4 +1,4 @@
-package org.suai.haus;
+package org.suai.trySwing.haus;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -61,7 +61,9 @@ public class MyPanel extends JPanel {
             setBackground(new Color(47, 79, 79));
         }
         g.setColor(Color.red);
-        //g.drawRect(350, 200, 100, 100);
+        g.drawRect(10, 30, 100, 100);
+        g.drawRect(10, 30, 50, 50);
         g.drawImage(im_haus, 300, 150, null);
+        g.drawRect(300, 150, 50, 50);
     }
 }

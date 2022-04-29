@@ -1,11 +1,9 @@
-package org.suai.paint;
+package org.suai.trySwing.paint;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 
 public class Paint extends JFrame implements ActionListener {
     JButton green = new JButton();

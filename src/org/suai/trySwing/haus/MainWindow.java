@@ -1,4 +1,4 @@
-package org.suai.haus;
+package org.suai.trySwing.haus;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
