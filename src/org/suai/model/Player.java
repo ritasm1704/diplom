@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class Player extends GameObject {
 
+    int number;
+    boolean isDead = false;
     private boolean isRunning = false;
     private int health;
     private int maxHealth;
@@ -12,9 +14,9 @@ public class Player extends GameObject {
     private int minSpeed;
     private int maxSpeed;
     private Weapon weapon;
-    private Arena arena;
 
-    public Player(int x, int y, int width, int height, int maxHealth, int minSpeed, int maxSpeed, Arena arena) {
+
+    public Player(int x, int y, int width, int height, int maxHealth, int minSpeed, int maxSpeed, int number) {
 
         super(x, y, width, height);
         this.maxHealth = maxHealth;
@@ -23,7 +25,7 @@ public class Player extends GameObject {
         this.speed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.weapon = new Weapon(10, 1);
-        this.arena = arena;
+        this.number = number;
     }
 
     public void reduceHealth(int a) {
@@ -78,36 +80,34 @@ public class Player extends GameObject {
         return speed;
     }
 
-    public void moveX(int a) {
-        setX(getX() + a * speed);
+    public void moveX(int a, int[][] arena) {
+        if (getX() + a >= 0 && getX() + a < arena[0].length && arena[getY()][getX() + a] != -1 ) {
+            setX(getX() + a * speed);
+        }
     }
 
-    public void moveY(int a) {
-        setY(getY() + a * speed);
-    }
-
-    public GameObject checkCollision() {
-
-
-        return null;
+    public void moveY(int a, int[][] arena) {
+        if (getY() + a >= 0 && getY() + a < arena.length && arena[getY() + a][getX()] != -1 ) {
+            setY(getY() + a * speed);
+        }
     }
 
     public void itIsRunning(boolean a) {
         isRunning = a;
     }
 
-    public void update(Arena arena) {
-        if (arena.rightPressed) {
-            moveX(1);
+    public void update(InputComponent inputComponent, int[][] arena) {
+        if (inputComponent.rightPressed) {
+            moveX(1, arena);
         }
-        if (arena.leftPressed) {
-            moveX(-1);
+        if (inputComponent.leftPressed) {
+            moveX(-1, arena);
         }
-        if (arena.upPressed) {
-            moveY(-1);
+        if (inputComponent.upPressed) {
+            moveY(-1, arena);
         }
-        if (arena.downPressed) {
-            moveY(1);
+        if (inputComponent.downPressed) {
+            moveY(1, arena);
         }
     }
 

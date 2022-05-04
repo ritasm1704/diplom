@@ -1,5 +1,6 @@
 package org.suai.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Monster extends GameObject{
@@ -8,75 +9,156 @@ public class Monster extends GameObject{
     private int health;
     private int speed;
     private Weapon weapon;
-    private Arena arena;
     private int radius;
+    int numberOfPlayer = -1;
 
-    public Monster(int x, int y, int width, int height, int health, int speed, int radius, Weapon weapon, Arena arena) {
+    public Monster(int x, int y, int width, int height, int health, int speed, int radius, Weapon weapon) {
         super(x, y, width, height);
         this.health = health;
         this.speed = speed;
         this.radius = radius;
         this.weapon = weapon;
-        this.arena = arena;
     }
 
     public void itIsRunning(boolean a) {
         isRunning = a;
     }
 
-    public void moveX(int a) {
-        setX(getX() + a * speed);
-    }
-
-    public void moveY(int a) {
-        setY(getY() + a * speed);
-    }
-
-    public void update() {
-
-        int widthOfArena = arena.getWidthOfArena();
-        int heightOfArena = arena.getHeightOfArena();
-        int[][] arenaAsMas = arena.getArenaAsMas();
-
-        int xStart = getX();
-        int yStart = getY();
-        Node first = new Node(xStart, yStart, arenaAsMas);
-        Player player = search();
-        if (player != null) {
-            dijkstra(xStart, yStart, player.getX(), player.getY(), first);
+    public void moveX(int a, int[][] arena) {
+        if (getX() + a >= 0 && getX() + a < arena[0].length && arena[getY()][getX() + a] != -1 ) {
+            setX(getX() + a * speed);
         }
     }
 
-    public Player search() {
-        List<Player> players = arena.getPlayers();
-        isRunning = false;
-        if (players == null) {
-            return null;
+    public void moveY(int a, int[][] arena) {
+        if (getY() + a >= 0 && getY() + a < arena.length && arena[getY() + a][getX()] != -1 ) {
+            setY(getY() + a * speed);
         }
+    }
+
+    public void update(int[][] arena, ArrayList<Player> players) {
+
 
         Player nearest = null;
-        for (int i = 0; i < players.size(); i++) {
-            Player player = players.get(i);
-            for (int x = getX() - radius; x <= getX() + radius; x++){
-                for (int y = getY() - radius; y <= getY() + radius; y++) {
-
-                    if (player.getX() == x && player.getY() == y) {
-                        isRunning = true;
+        /*if (numberOfPlayer != -1) {
+            for (int i = 0; i < players.size(); i++) {
+                Player player = players.get(i);
+                if (player.number == numberOfPlayer) {
+                    if (player.isDead) {
+                        numberOfPlayer = -1;
+                    }
+                    else {
                         nearest = player;
                     }
                 }
             }
         }
-        return nearest;
+
+        if (numberOfPlayer == -1) {
+            for (int i = 0; i < players.size(); i++) {
+                Player player = players.get(i);
+                if (!player.isDead) {
+
+                }
+            }
+        }*/
+
+        nearest = players.get(0);
+        if (nearest != null) {
+            int xStart = getX();
+            int yStart = getY();
+            int xFinish = nearest.getX();
+            int yFinish = nearest.getY();
+
+            int[][] copyOfArena = new int[arena.length][arena[0].length];
+
+            for (int i = 0; i < arena.length; i++) {
+                for (int j = 0; j < arena[0].length; j++) {
+                    if (arena[i][j] != -1) {
+                        copyOfArena[i][j] = Math.max(Math.abs(yStart - i),Math.abs(xStart - j));
+                    }
+                    else {
+                        copyOfArena[i][j] = Integer.MAX_VALUE;
+                    }
+                }
+            }
+
+            int[] masPrev = new int[] {xFinish, yFinish};
+            int[] mas = new int[] {xFinish, yFinish};
+
+            while (!(mas[0] == xStart && mas[1] == yStart)) {
+                masPrev = mas;
+                mas = getNextStep(mas[0], mas[1], copyOfArena);
+            }
+            setX(masPrev[0]);
+            setY(masPrev[1]);
+
+            /*for (int i = 0; i < copyOfArena.length; i++) {
+                for (int j = 0; j < copyOfArena[0].length; j++) {
+                    System.out.print(copyOfArena[i][j] + " ");
+                }
+                System.out.println();
+            }*/
+
+
+        }
+
     }
 
-    public void dijkstra(int xStart, int yStart, int xFinish, int yFinish, Node first) {
+    public int[] getNextStep(int x, int y, int[][] arena) {
 
 
-    }
+        int minX = 0;
+        int minY = 0;
+        if (y + 1 < arena.length) {
+            if (arena[y + 1][x] < arena[minY][minX]) {
+                minY = y + 1;
+                minX = x;
+            }
+            if (x + 1 < arena[0].length) {
+                if (arena[y + 1][x + 1] < arena[minY][minX]) {
+                    minY = y + 1;
+                    minX = x + 1;
+                }
+            }
+            if (x - 1 >= 0) {
+                if (arena[y + 1][x - 1] < arena[minY][minX]) {
+                    minY = y + 1;
+                    minX = x - 1;
+                }
+            }
+        }
+        if (y - 1 >= 0) {
+            if (arena[y - 1][x] < arena[minY][minX]) {
+                minY = y - 1;
+                minX = x;
+            }
+            if (x + 1 < arena[0].length) {
+                if (arena[y - 1][x + 1] < arena[minY][minX]) {
+                    minY = y - 1;
+                    minX = x + 1;
+                }
+            }
+            if (x - 1 >= 0) {
+                if (arena[y - 1][x - 1] < arena[minY][minX]) {
+                    minY = y - 1;
+                    minX = x - 1;
+                }
+            }
+        }
+        if (x + 1 < arena[0].length) {
+            if (arena[y][x + 1] < arena[minY][minX]) {
+                minY = y;
+                minX = x + 1;
+            }
+        }
+        if (x - 1 >= 0) {
+            if (arena[y][x - 1] < arena[minY][minX]) {
+                minY = y;
+                minX = x - 1;
+            }
+        }
 
-    public void A(int xStart, int yStart, int xFinish, int yFinish, Node first) {
-
-
+        return new int[] {minX, minY};
     }
 }

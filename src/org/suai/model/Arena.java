@@ -1,90 +1,102 @@
 package org.suai.model;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-public class Arena extends JFrame {
+public class Arena extends JPanel {
 
-    boolean leftPressed = false;
-    boolean rightPressed = false;
-    boolean downPressed = false;
-    boolean upPressed = false;
+    private InputComponent inputComponent = new InputComponent();
+    private ArenaModel arenaModel;
+    private boolean isOver = false;
 
-    ArrayList<Monster> monsters;
-    ArrayList<Player> players;
+    private final int tileWidth = 10;
+    private final int tileHeight = 10;
 
-    private class KeyInputHandler extends KeyAdapter {
+    class MyKeyInputHandler extends KeyAdapter {
 
+        @Override
         public void  keyPressed(KeyEvent e) {
 
             switch (e.getKeyCode()) {
-                case (KeyEvent.VK_D) -> rightPressed = true;
-                case (KeyEvent.VK_A) -> leftPressed = true;
-                case (KeyEvent.VK_W) -> upPressed = true;
-                case (KeyEvent.VK_S) -> downPressed = true;
+                case (KeyEvent.VK_D) -> inputComponent.rightPressed = true;
+                case (KeyEvent.VK_A) -> inputComponent.leftPressed = true;
+                case (KeyEvent.VK_W) -> inputComponent.upPressed = true;
+                case (KeyEvent.VK_S) -> inputComponent.downPressed = true;
             }
         }
+        @Override
         public void  keyReleased(KeyEvent e) {
+
             switch (e.getKeyCode()) {
-                case (KeyEvent.VK_D) -> rightPressed = false;
-                case (KeyEvent.VK_A) -> leftPressed = false;
-                case (KeyEvent.VK_W) -> upPressed = false;
-                case (KeyEvent.VK_S) -> downPressed = false;
+                case (KeyEvent.VK_D) -> inputComponent.rightPressed = false;
+                case (KeyEvent.VK_A) -> inputComponent.leftPressed = false;
+                case (KeyEvent.VK_W) -> inputComponent.upPressed = false;
+                case (KeyEvent.VK_S) -> inputComponent.downPressed = false;
             }
         }
+        @Override
         public void  keyTyped(KeyEvent e) {
 
         }
     }
 
-    private int widthOfArena;
-    private int heightOfArena;
-    private int[][] arenaAsMas;
-    boolean isOver = false;
-
     public Arena(int width, int height) {
-        addKeyListener(new KeyInputHandler());
-        widthOfArena = width;
-        heightOfArena = height;
 
-        arenaAsMas = new int[heightOfArena][widthOfArena];
-        for (int i = 0; i < heightOfArena; i++) {
-            for (int j = 0; j < widthOfArena; j++) {
-                if (i == 0 || i == heightOfArena - 1 || j == 0 || j == widthOfArena - 1) {
-                    arenaAsMas[i][j] = 1;
-                }
-                else {
-                    arenaAsMas[i][j] = 0;
+        this.addKeyListener(new MyKeyInputHandler());
+        setFocusable(true);
+        arenaModel = new ArenaModel(width, height);
+        System.out.println("Arena " + width + ":" + height);
+    }
+
+    public void paintComponent(Graphics g) {
+        //System.out.println("paintComponent");
+        super.paintComponent(g);
+
+
+        int[][] arena = arenaModel.getArenaAsMas();
+
+        for (int i = 0; i < arena.length; i++) {
+            for (int j = 0; j < arena[0].length; j++) {
+                if (arena[i][j] == -1) {
+                    g.setColor(Color.red);
+                    g.fillRect(j*tileHeight, i*tileWidth, tileWidth, tileHeight);
+                } else {
+                    g.setColor(Color.green);
+                    g.fillRect(j*tileHeight, i*tileWidth, tileWidth, tileHeight);
                 }
             }
+        }
+
+        ArrayList<Player> players = arenaModel.getPlayers();
+
+        for (int i = 0; i < players.size(); i++) {
+            g.setColor(Color.blue);
+            if (!players.get(i).isDead) {
+                g.fillRect(players.get(i).getX()*tileHeight, players.get(i).getY()*tileWidth,
+                        players.get(i).getWidth(), players.get(i).getHeight());
+            }
+
+        }
+
+        ArrayList<Monster> monsters = arenaModel.getMonsters();
+        for (int i = 0; i < monsters.size(); i++) {
+            g.setColor(Color.magenta);
+            g.fillRect(monsters.get(i).getX()*tileHeight, monsters.get(i).getY()*tileWidth,
+                    monsters.get(i).getWidth(), monsters.get(i).getHeight());
         }
     }
 
     public void update() {
-        for (int i = 0; i < monsters.size(); i++) {
-            monsters.get(i).update();
-        }
+        arenaModel.update(inputComponent);
+        //System.out.println("repaint");
+        repaint();
     }
 
     public boolean getIsOver() {
         return isOver;
     }
 
-    public int getHeightOfArena() {
-        return heightOfArena;
-    }
-
-    public int getWidthOfArena() {
-        return widthOfArena;
-    }
-
-    public int[][] getArenaAsMas() {
-        return arenaAsMas;
-    }
-
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
 }
